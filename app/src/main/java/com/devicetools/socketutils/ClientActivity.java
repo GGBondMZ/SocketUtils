@@ -84,7 +84,7 @@ public class ClientActivity extends AppCompatActivity {
         mBtSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final String returnServer = mEtMessage.getText().toString();
+                String sendData = getResources().getString(R.string.send_data);
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -92,7 +92,7 @@ public class ClientActivity extends AppCompatActivity {
                             if (socket == null) return;
                             OutputStream om = socket.getOutputStream();
                             om.write(Constant.SERVER_TEXT.getBytes());
-                            om.write(returnServer.getBytes());
+                            om.write(sendData.getBytes());
                             om.write("\n".getBytes());//[10]
                             om.flush();
                         } catch (Exception e) {

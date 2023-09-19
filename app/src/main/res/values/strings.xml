@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">SocketUtils</string>
+    <string name="send_data">{"type": "ClientSend", "Content": {"AirTemp": "27.4", "AirHumidity": "55.5", "PM2.5": "8", "PM10": "8", "CO2": "514", "formaldehyde": "159", "TVOC": "0.1"}}</string>
+    <string name="receive_data">{ "Result": "Ok", "Description": "" }</string>
 </resources>

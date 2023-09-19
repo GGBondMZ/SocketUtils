@@ -17,7 +17,7 @@
         android:id="@+id/et_ip"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="192.168.50.87" />
+        android:text="192.168.50.208" />
     <!-- 监听端口号 -->
     <TextView
         android:id="@+id/tv_port"
@@ -43,7 +43,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="输入要发送的消息："
-        android:text="123456" />
+        android:text="@string/send_data" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -68,14 +68,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="发送文字" />
+            android:text="发送" />
 
         <Button
             android:id="@+id/bt_send2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="发送图片" />
+            android:text="发送图片"
+            android:visibility="gone" />
     </LinearLayout>
     <!-- 接收的消息-->
     <TextView
