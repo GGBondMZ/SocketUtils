@@ -11,12 +11,20 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+/**
+ * Created by mz on 2023/09/19.
+ * Time: 09:10
+ * Description: Server
+ */
+
 public class TcpClient {
+
+    private static final String TAG = "SocketUtils-TcpClient";
 
     public static Socket socket;
 
-    public static void startClient(final String address ,final int port){
-        if (address == null){
+    public static void startClient(final String address, final int port) {
+        if (address == null) {
             return;
         }
         if (socket == null) {
@@ -24,9 +32,9 @@ public class TcpClient {
                 @Override
                 public void run() {
                     try {
-                        Log.i("tcp", "启动客户端");
+                        Log.d(TAG, "启动客户端");
                         socket = new Socket(address, port);
-                        Log.i("tcp", "客户端连接成功");
+                        Log.d(TAG, "客户端连接成功");
                         PrintWriter pw = new PrintWriter(socket.getOutputStream());
 
                         InputStream inputStream = socket.getInputStream();
@@ -35,17 +43,17 @@ public class TcpClient {
                         int len = -1;
                         while ((len = inputStream.read(buffer)) != -1) {
                             String data = new String(buffer, 0, len);
-                            Log.i("tcp", "收到服务器的数据---------------------------------------------:" + data);
+                            Log.d(TAG, "收到服务器的数据---------------------------------------------:" + data);
                             EventBus.getDefault().post(new MessageClient(data));
                         }
-                        Log.i("tcp", "客户端断开连接");
+                        Log.d(TAG, "客户端断开连接");
                         pw.close();
 
                     } catch (Exception EE) {
                         EE.printStackTrace();
-                        Log.i("tcp", "客户端无法连接服务器");
+                        Log.d(TAG, "客户端无法连接服务器");
 
-                    }finally {
+                    } finally {
                         try {
                             socket.close();
                         } catch (IOException e) {
@@ -58,7 +66,7 @@ public class TcpClient {
         }
     }
 
-    public static void sendTcpMessage(final String msg){
+    public static void sendTcpMessage(final String msg) {
         if (socket != null && socket.isConnected()) {
             new Thread(new Runnable() {
                 @Override

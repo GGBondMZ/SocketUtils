@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         mBt1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, ServerActivity.class));//服务器
+                startActivity(new Intent(MainActivity.this, ServerActivity.class));// 服务器
             }
         });
         mBt2.setOnClickListener(new View.OnClickListener() {

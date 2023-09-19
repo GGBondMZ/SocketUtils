@@ -6,6 +6,12 @@ import com.devicetools.socketutils.R;
 
 import java.util.List;
 
+/**
+ * Created by mz on 2023/09/19.
+ * Time: 09:10
+ * Description: Server
+ */
+
 public class DataListAdapter extends BaseQuickAdapter<String, BaseViewHolder> {
 
     public DataListAdapter(List list) {

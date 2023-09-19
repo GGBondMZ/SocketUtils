@@ -31,8 +31,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -49,7 +47,7 @@ public class ServerActivity extends AppCompatActivity {
 
     private static final String TAG = "SocketUtils-ServerActivity";
     private ServerSocket serverSocket;// 创建ServerSocket对象
-    private  Socket socket;
+    private Socket socket;
     List<Socket> mSocketList;
     //    Socket socket;
     private ServerThread mServerThread;
@@ -89,9 +87,6 @@ public class ServerActivity extends AppCompatActivity {
         mBtStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // isStop = false;
-                // mServerThread = new ServerThread();
-                // mServerThread.start();
                 startServer();
             }
         });
@@ -104,24 +99,6 @@ public class ServerActivity extends AppCompatActivity {
         mBtSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // final String returnServer = mEtMessage.getText().toString();
-                // new Thread(new Runnable() {
-                //     @Override
-                //     public void run() {
-                //         for (Socket socket : mSocketList) {
-                //             try {
-                //                 if (socket == null) return;
-                //                 OutputStream om = socket.getOutputStream();
-                //                 PrintWriter writer = new PrintWriter(om, true);// 告诉客户端连接成功 并传状态过去
-                //                 writer.write(returnServer + "\n");
-                //                 writer.flush();
-                //             } catch (Exception e) {
-                //                 e.printStackTrace();
-                //                 Log.i(TAG, e.toString());
-                //             }
-                //         }
-                //     }
-                // }).start();
                 sendTcpMessage(String.valueOf(mEtMessage.getText()));
             }
         });
@@ -134,23 +111,23 @@ public class ServerActivity extends AppCompatActivity {
     }
 
 
-    public  void startServer(){
-        if (serverSocket == null){
+    public void startServer() {
+        if (serverSocket == null) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
                     try {
                         int port = Integer.valueOf(mEtPort.getText().toString());// 获取portEditText中的端口号
                         serverSocket = new ServerSocket(port);
-                        Log.i("tcp" , "服务器等待连接中");
+                        Log.d(TAG, "服务器等待连接中");
                         socket = serverSocket.accept();
-                        Log.i("tcp" , "客户端连接上来了");
+                        Log.d(TAG, "客户端连接上来了");
                         InputStream inputStream = socket.getInputStream();
                         byte[] buffer = new byte[1024];
                         int len = -1;
                         while ((len = inputStream.read(buffer)) != -1) {
                             String data = new String(buffer, 0, len);
-                            Log.i("tcp" , "收到客户端的数据-----------------------------:" + data);
+                            Log.d(TAG, "收到客户端的数据-----------------------------:" + data);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -165,7 +142,7 @@ public class ServerActivity extends AppCompatActivity {
                     } catch (IOException e) {
                         e.printStackTrace();
 
-                    }finally {
+                    } finally {
                         try {
                             socket.close();
                         } catch (IOException e) {
@@ -184,7 +161,7 @@ public class ServerActivity extends AppCompatActivity {
         }
     }
 
-    public  void sendTcpMessage(final String msg){
+    public void sendTcpMessage(final String msg) {
         if (socket != null && socket.isConnected()) {
             new Thread(new Runnable() {
                 @Override
