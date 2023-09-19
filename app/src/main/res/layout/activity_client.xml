@@ -17,7 +17,7 @@
         android:id="@+id/et_ip"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="192.168.50.87" />
+        android:text="192.168.50.208" />
     <!-- 监听端口号 -->
     <TextView
         android:id="@+id/tv_port"
@@ -30,7 +30,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="4601" />
-
     <!-- 发送的消息 -->
     <TextView
         android:id="@+id/tv_message"
@@ -43,7 +42,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="输入要发送的消息："
-        android:text="123456" />
+        android:text="@string/send_data" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -87,5 +86,16 @@
     <EditText
         android:id="@+id/et_receive"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:visibility="gone" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="8dp"
+        android:overScrollMode="never"
+        android:scrollbars="none" />
 </LinearLayout>

@@ -20,6 +20,11 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.devicetools.socketutils.adapter.DataListAdapter;
 
 import java.io.DataOutputStream;
 import java.io.File;
@@ -38,6 +43,8 @@ import java.security.MessageDigest;
  * Description: Client
  */
 public class ClientActivity extends AppCompatActivity {
+
+    private static final String TAG = "SocketUtils-ClientActivity";
     private EditText mEtPort;
     private EditText mEtMessage;
     private EditText mEtReceive;
@@ -47,6 +54,10 @@ public class ClientActivity extends AppCompatActivity {
     private Button mBtSend;
     private Button mBtSend2;
     private TextView mTvIp;
+
+    private RecyclerView recy;
+
+    private DataListAdapter dataListAdapter;
     Socket socket;
     private ServerThread mServerThread;
     private boolean isStop;
@@ -64,12 +75,18 @@ public class ClientActivity extends AppCompatActivity {
         mBtStop = findViewById(R.id.bt_stop);
         mBtSend = findViewById(R.id.bt_send);
         mBtSend2 = findViewById(R.id.bt_send2);
+        recy = findViewById(R.id.recyclerView);
+
+        dataListAdapter = new DataListAdapter(null);
+        recy.setLayoutManager(new LinearLayoutManager(this));
+        recy.setAdapter(dataListAdapter);
+        recy.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
         mTvIp.setText(getLocalIpAddress());
         mBtStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                stopServerSocket();
+                stopServerSocket(false);
                 isStop = false;
                 mServerThread = new ServerThread();
                 mServerThread.start();
@@ -78,13 +95,13 @@ public class ClientActivity extends AppCompatActivity {
         mBtStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                stopServerSocket();
+                stopServerSocket(true);
             }
         });
         mBtSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String sendData = getResources().getString(R.string.send_data);
+                String sendData = String.valueOf(mEtMessage.getText());
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -97,7 +114,7 @@ public class ClientActivity extends AppCompatActivity {
                             om.flush();
                         } catch (Exception e) {
                             e.printStackTrace();
-                            Log.i("Lin", e.toString());
+                            Log.i(TAG, e.toString());
                         }
                     }
                 }).start();
@@ -112,14 +129,16 @@ public class ClientActivity extends AppCompatActivity {
         });
     }
 
-    private void stopServerSocket() {
+    private void stopServerSocket(boolean openToast) {
         isStop = true;
         try {
             if (socket != null) {
                 socket.close();
             }
-            Toast.makeText(ClientActivity.this, "停止服务", Toast.LENGTH_SHORT).show();
-            Log.i("Lin", "停止服务");
+            if (openToast) {
+                Toast.makeText(ClientActivity.this, "停止服务", Toast.LENGTH_SHORT).show();
+            }
+            Log.i(TAG, "停止服务");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -129,7 +148,7 @@ public class ClientActivity extends AppCompatActivity {
         public void run() {
             try {
                 String ip = mEtIp.getText().toString();
-                int port = Integer.valueOf(mEtPort.getText().toString());//获取portEditText中的端口号
+                int port = Integer.valueOf(mEtPort.getText().toString());// 获取portEditText中的端口号
                 socket = new Socket();
                 socket.connect(new InetSocketAddress(ip, port));
                 final String socketAddress = socket.getRemoteSocketAddress().toString();
@@ -137,9 +156,9 @@ public class ClientActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         Toast.makeText(ClientActivity.this, "启动服务", Toast.LENGTH_SHORT).show();
-                        Log.i("Lin", "启动服务");
+                        Log.i(TAG, "启动服务");
                         Toast.makeText(ClientActivity.this, "成功建立与客户端的连接 : " + socketAddress, Toast.LENGTH_SHORT).show();
-                        Log.i("Lin", "成功建立与客户端的连接 : " + socketAddress);
+                        Log.i(TAG, "成功建立与客户端的连接 : " + socketAddress);
                     }
                 });
                 while (!isStop) {
@@ -150,15 +169,19 @@ public class ClientActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            mEtReceive.setText(mEtReceive.getText().toString() + socketAddress + " : " + s);
+                            // mEtReceive.setText(mEtReceive.getText().toString() + socketAddress + " : " + s);
+                            dataListAdapter.addData(mEtReceive.getText().toString() + socketAddress + " : " + s);
+                            if (dataListAdapter.getData() != null && dataListAdapter.getData().size() > 0) {
+                                recy.smoothScrollToPosition(dataListAdapter.getData().size());
+                            }
                         }
                     });
-                    Log.i("Lin", "反馈为：" + s);
+                    Log.i(TAG, "反馈为：" + s);
 
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                Log.i("Lin", e.toString());
+                Log.i(TAG, e.toString());
             }
         }
     }
@@ -166,24 +189,25 @@ public class ClientActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (100 == requestCode) {
             if (data != null) {
-                //获取数据
-                //获取内容解析者对象
+                // 获取数据
+                // 获取内容解析者对象
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
                         try {
-                            Log.i("Lin", data.getData().toString());
+                            Log.i(TAG, data.getData().toString());
 
                             String imagePath = null;
                             Uri uri = data.getData();
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                                 if (DocumentsContract.isDocumentUri(ClientActivity.this, uri)) {
-                                    //如果是document类型的uri，则通过document id处理
+                                    // 如果是document类型的uri，则通过document id处理
                                     String docId = DocumentsContract.getDocumentId(uri);
                                     if ("com.android.providers.media.documents".equals(uri.getAuthority())) {
-                                        //解析出数字格式的id
+                                        // 解析出数字格式的id
                                         String id = docId.split(":")[1];
                                         String selection = MediaStore.Images.Media._ID + "=" + id;
                                         imagePath = getImagePath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, selection);
@@ -191,14 +215,14 @@ public class ClientActivity extends AppCompatActivity {
                                         Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.valueOf(docId));
                                         imagePath = getImagePath(contentUri, null);
                                     } else if ("content".equalsIgnoreCase(uri.getScheme())) {
-                                        //如果是content类型的uri，则使用普通方式处理
+                                        // 如果是content类型的uri，则使用普通方式处理
                                         imagePath = getImagePath(uri, null);
                                     } else if ("file".equalsIgnoreCase(uri.getScheme())) {
-                                        //如果是file类型的uri，直接获取图片路径即可
+                                        // 如果是file类型的uri，直接获取图片路径即可
                                         imagePath = uri.getPath();
                                     }
-                                    //根据图片路径显示图片
-                                    Log.i("Lin", imagePath);
+                                    // 根据图片路径显示图片
+                                    Log.i(TAG, imagePath);
                                     String finalImagePath = imagePath;
 
                                     File file = new File(finalImagePath);
@@ -208,7 +232,11 @@ public class ClientActivity extends AppCompatActivity {
                                         runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {
-                                                mEtReceive.setText(mEtReceive.getText().toString() + "file = " + fileMD5 + "\n");
+                                                // mEtReceive.setText(mEtReceive.getText().toString() + "file = " + fileMD5 + "\n");
+                                                dataListAdapter.addData(mEtReceive.getText().toString() + "file = " + fileMD5 + "\n");
+                                                if (dataListAdapter.getData() != null && dataListAdapter.getData().size() > 0) {
+                                                    recy.smoothScrollToPosition(dataListAdapter.getData().size());
+                                                }
                                             }
                                         });
 
@@ -230,13 +258,13 @@ public class ClientActivity extends AppCompatActivity {
                                             dis.flush();
                                         }
                                         fileInputStream.close();
-                                        Log.i("Lin", "传输成功");
+                                        Log.i(TAG, "传输成功");
                                     }
                                 }
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
-                            Log.i("Lin", e.toString());
+                            Log.i(TAG, e.toString());
                         }
                     }
                 }).start();
@@ -277,6 +305,7 @@ public class ClientActivity extends AppCompatActivity {
     /**
      * 通过uri和selection来获取真实的图片路径
      */
+    @SuppressLint("Range")
     private String getImagePath(Uri uri, String selection) {
         String path = null;
         Cursor cursor = getContentResolver().query(uri, null, selection, null, null);
@@ -295,7 +324,7 @@ public class ClientActivity extends AppCompatActivity {
     public void openAlbum() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("image/*");
-        //设置请求码，以便我们区分返回的数据
+        // 设置请求码，以便我们区分返回的数据
         startActivityForResult(intent, 100);
     }
 
@@ -309,9 +338,7 @@ public class ClientActivity extends AppCompatActivity {
         // 获取32位整型IP地址
         int ipAddress = wifiInfo.getIpAddress();
 
-        //返回整型地址转换成“*.*.*.*”地址
-        return String.format("%d.%d.%d.%d",
-                (ipAddress & 0xff), (ipAddress >> 8 & 0xff),
-                (ipAddress >> 16 & 0xff), (ipAddress >> 24 & 0xff));
+        // 返回整型地址转换成“*.*.*.*”地址
+        return String.format("%d.%d.%d.%d", (ipAddress & 0xff), (ipAddress >> 8 & 0xff), (ipAddress >> 16 & 0xff), (ipAddress >> 24 & 0xff));
     }
 }

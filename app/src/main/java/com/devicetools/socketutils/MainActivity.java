@@ -15,6 +15,8 @@ import permissions.dispatcher.RuntimePermissions;
 @RuntimePermissions
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = "SocketUtils-MainActivity";
+
     private TextView mTvIp;
     private Button mBt1;
     private Button mBt2;
@@ -35,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         mBt2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, ClientActivity.class));//客户端
+                startActivity(new Intent(MainActivity.this, ClientActivity.class));// 客户端
             }
         });
     }
