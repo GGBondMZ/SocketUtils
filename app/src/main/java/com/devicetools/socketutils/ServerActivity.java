@@ -19,6 +19,8 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.devicetools.socketutils.adapter.DataListAdapter;
 import com.devicetools.socketutils.bean.MessageServer;
 
@@ -132,6 +134,15 @@ public class ServerActivity extends AppCompatActivity {
                         while ((len = inputStream.read(buffer)) != -1) {
                             String data = new String(buffer, 0, len);
                             Log.d(TAG, "收到客户端的数据:" + "\n" + data);
+                            JSONObject jsonData = JSON.parseObject(data);
+                            Log.d(TAG, "json:" + "\n" + jsonData.toString());
+
+                            String type = jsonData.getString("type");
+                            Log.d(TAG, "AirHumidity = " + type);
+                            String airTemp = jsonData.getJSONObject("Content").getString("AirTemp");
+                            Log.d(TAG, "AirTemp = " + airTemp);
+                            String airHumidity = jsonData.getJSONObject("Content").getString("AirHumidity");
+                            Log.d(TAG, "AirHumidity = " + airHumidity);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {

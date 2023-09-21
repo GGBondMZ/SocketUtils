@@ -41,4 +41,5 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
     implementation "io.github.cymchad:BaseRecyclerViewAdapterHelper:3.0.14"
     implementation 'org.greenrobot:eventbus:3.0.0'
+    implementation 'com.alibaba.fastjson2:fastjson2:2.0.40'
 }
